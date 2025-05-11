@@ -19,6 +19,21 @@ public class Matrix {
         this.size = pixelRows.length;
     }
 
+    public Matrix(PixelRow firstRow, PixelRow secondRow) {
+        this.pixelRows = new PixelRow[2];
+        this.pixelRows[0] = firstRow;
+        this.pixelRows[1] = secondRow;
+        this.size = pixelRows.length;
+    }
+
+    public Matrix(PixelRow firstRow, PixelRow secondRow, PixelRow thirdRow) {
+        this.pixelRows = new PixelRow[3];
+        this.pixelRows[0] = firstRow;
+        this.pixelRows[1] = secondRow;
+        this.pixelRows[2] = thirdRow;
+        this.size = pixelRows.length;
+    }
+
     public int getSize() {
         return size;
     }

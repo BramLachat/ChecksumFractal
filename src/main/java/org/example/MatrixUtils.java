@@ -1,7 +1,7 @@
 package org.example;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MatrixUtils {
 
@@ -45,23 +45,47 @@ public class MatrixUtils {
         return new Matrix(mapColumnsToRows(rotatedPixelColumns));
     }
 
-    public static List<Matrix> splitInFour(Matrix matrix) {
-        int size = matrix.getSize();
-        List<Matrix> splitMatrix = new LinkedList<>();
-        PixelRow[] leftMatrixRows = new PixelRow[size / 2];
-        PixelRow[] rightMatrixRows = new PixelRow[size / 2];
-        for (int rowindex = 0; rowindex < (size / 2); rowindex++) {
-            leftMatrixRows[rowindex] = RowUtils.getFirstHalf(matrix.getPixelRow(rowindex));
-            rightMatrixRows[rowindex] = RowUtils.getSecondHalf(matrix.getPixelRow(rowindex));
+    public static Map<RowColIndex, Matrix> splitIn2x2(Matrix matrix) {
+        Map<RowColIndex, Matrix> matrixGrid2x2 = new HashMap<>();
+        if (matrix.getSize() == 2) {
+            matrixGrid2x2.put(new RowColIndex(0, 0), matrix);
+            return matrixGrid2x2;
         }
-        splitMatrix.add(new Matrix(leftMatrixRows));
-        splitMatrix.add(new Matrix(rightMatrixRows));
-        for (int rowindex = (size / 2); rowindex < size; rowindex++) {
-            leftMatrixRows[rowindex % 2] = RowUtils.getFirstHalf(matrix.getPixelRow(rowindex));
-            rightMatrixRows[rowindex % 2] = RowUtils.getSecondHalf(matrix.getPixelRow(rowindex));
+        for (int rowIndex = 0; rowIndex < matrix.getSize();) {
+            PixelRow[] firstRowPixels = RowUtils.splitBy2(matrix.getPixelRow(rowIndex));
+            PixelRow[] secondRowPixels = RowUtils.splitBy2(matrix.getPixelRow(rowIndex + 1));
+            for (int matrixIndex = 0; matrixIndex < firstRowPixels.length; matrixIndex++) {
+                matrixGrid2x2.put(
+                        new RowColIndex(rowIndex, matrixIndex),
+                        new Matrix(firstRowPixels[matrixIndex], secondRowPixels[matrixIndex]));
+            }
+            rowIndex += 2;
         }
-        splitMatrix.add(new Matrix(leftMatrixRows));
-        splitMatrix.add(new Matrix(rightMatrixRows));
-        return splitMatrix;
+        return matrixGrid2x2;
+    }
+
+    public static Map<RowColIndex, Matrix> splitIn3x3(Matrix matrix) {
+        Map<RowColIndex, Matrix> matrixGrid3x3 = new HashMap<>();
+        if (matrix.getSize() == 3) {
+            matrixGrid3x3.put(new RowColIndex(0, 0), matrix);
+            return matrixGrid3x3;
+        }
+        for (int rowIndex = 0; rowIndex < matrix.getSize();) {
+            PixelRow[] firstRowPixels = RowUtils.splitBy3(matrix.getPixelRow(rowIndex));
+            PixelRow[] secondRowPixels = RowUtils.splitBy3(matrix.getPixelRow(rowIndex + 1));
+            PixelRow[] thirdRowPixels = RowUtils.splitBy3(matrix.getPixelRow(rowIndex + 2));
+            for (int matrixIndex = 0; matrixIndex < firstRowPixels.length; matrixIndex++) {
+                matrixGrid3x3.put(
+                        new RowColIndex(rowIndex, matrixIndex),
+                        new Matrix(firstRowPixels[matrixIndex], secondRowPixels[matrixIndex], thirdRowPixels[matrixIndex])
+                );
+            }
+            rowIndex += 3;
+        }
+        return matrixGrid3x3;
+    }
+
+    public static Matrix mergeMatrices(Map<RowColIndex, Matrix> matrixGrid) {
+        return null;
     }
 }
