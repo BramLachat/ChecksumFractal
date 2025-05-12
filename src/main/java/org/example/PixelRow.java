@@ -3,8 +3,8 @@ package org.example;
 public class PixelRow {
     private char[] pixels;
 
-    public static PixelRow initialize(String pixelRow) {
-        return new PixelRow(pixelRow.toCharArray());
+    public PixelRow(String pixelRow) {
+        this.pixels = pixelRow.toCharArray();
     }
 
     public PixelRow(char[] pixels) {

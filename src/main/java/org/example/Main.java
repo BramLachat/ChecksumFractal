@@ -45,8 +45,8 @@ public class Main {
         for (String inputLine : input) {
             String[] extensionRule = inputLine.split(" => ");
 
-            Matrix extRuleMatchMatrix = Matrix.initialize(extensionRule[0]);
-            Matrix extRuleReplaceMatrix = Matrix.initialize(extensionRule[1]);
+            Matrix extRuleMatchMatrix = new Matrix(extensionRule[0]);
+            Matrix extRuleReplaceMatrix = new Matrix(extensionRule[1]);
 
             extensionRuleMap.put(extRuleMatchMatrix.toString(), extRuleReplaceMatrix);
             extensionRuleMap.put(MatrixUtils.mirrorHorizontal(extRuleMatchMatrix).toString(), extRuleReplaceMatrix);
@@ -69,22 +69,25 @@ public class Main {
         }
 
         String startPixelString = ".#./..#/###";
-        Matrix currentMatrix = Matrix.initialize(startPixelString);
+        Matrix currentMatrix = new Matrix(startPixelString);
 
         for (int iteration = 0; iteration < 20; iteration++) {
-            Map<RowColIndex, Matrix> matrixGrid = new HashMap<>();
+            Map<Integer, Map<Integer, Matrix>> matrixGrid = null;
             if (currentMatrix.getSize() % 2 == 0) {
                 matrixGrid = MatrixUtils.splitIn2x2(currentMatrix);
-            }
-
-            if (currentMatrix.getSize() % 3 == 0) {
+            } else if (currentMatrix.getSize() % 3 == 0) {
                 matrixGrid = MatrixUtils.splitIn3x3(currentMatrix);
+            } else {
+                throw new RuntimeException("TODO");
             }
 
-            for (RowColIndex rowColIndex : matrixGrid.keySet()) {
-                Matrix extRuleReplaceMatrix = extensionRuleMap.get(matrixGrid.get(rowColIndex).toString());
-                if (extRuleReplaceMatrix != null) {
-                    matrixGrid.put(rowColIndex, extRuleReplaceMatrix);
+            for (Integer rowIndex : matrixGrid.keySet()) {
+                Map<Integer, Matrix> matrixRow = matrixGrid.get(rowIndex);
+                for (Integer colIndex : matrixRow.keySet()) {
+                    Matrix extRuleReplaceMatrix = extensionRuleMap.get(matrixRow.get(colIndex).toString());
+                    if (extRuleReplaceMatrix != null) {
+                        matrixRow.put(colIndex, extRuleReplaceMatrix);
+                    }
                 }
             }
 

@@ -45,47 +45,62 @@ public class MatrixUtils {
         return new Matrix(mapColumnsToRows(rotatedPixelColumns));
     }
 
-    public static Map<RowColIndex, Matrix> splitIn2x2(Matrix matrix) {
-        Map<RowColIndex, Matrix> matrixGrid2x2 = new HashMap<>();
+    public static Map<Integer, Map<Integer, Matrix>> splitIn2x2(Matrix matrix) {
+        Map<Integer, Map<Integer, Matrix>> matrixGrid2x2 = new HashMap<>();
         if (matrix.getSize() == 2) {
-            matrixGrid2x2.put(new RowColIndex(0, 0), matrix);
+            Map<Integer, Matrix> matrixRow2x2 = new HashMap<>();
+            matrixRow2x2.put(0, matrix);
+            matrixGrid2x2.put(0, matrixRow2x2);
             return matrixGrid2x2;
         }
         for (int rowIndex = 0; rowIndex < matrix.getSize();) {
+            Map<Integer, Matrix> matrixRow2x2 = new HashMap<>();
             PixelRow[] firstRowPixels = RowUtils.splitBy2(matrix.getPixelRow(rowIndex));
             PixelRow[] secondRowPixels = RowUtils.splitBy2(matrix.getPixelRow(rowIndex + 1));
             for (int matrixIndex = 0; matrixIndex < firstRowPixels.length; matrixIndex++) {
-                matrixGrid2x2.put(
-                        new RowColIndex(rowIndex, matrixIndex),
-                        new Matrix(firstRowPixels[matrixIndex], secondRowPixels[matrixIndex]));
+                matrixRow2x2.put(matrixIndex, new Matrix(firstRowPixels[matrixIndex], secondRowPixels[matrixIndex]));
             }
+            matrixGrid2x2.put(rowIndex / 2, matrixRow2x2);
             rowIndex += 2;
         }
         return matrixGrid2x2;
     }
 
-    public static Map<RowColIndex, Matrix> splitIn3x3(Matrix matrix) {
-        Map<RowColIndex, Matrix> matrixGrid3x3 = new HashMap<>();
+    public static Map<Integer, Map<Integer, Matrix>> splitIn3x3(Matrix matrix) {
+        Map<Integer, Map<Integer, Matrix>> matrixGrid3x3 = new HashMap<>();
         if (matrix.getSize() == 3) {
-            matrixGrid3x3.put(new RowColIndex(0, 0), matrix);
+            Map<Integer, Matrix> matrixRow3x3 = new HashMap<>();
+            matrixRow3x3.put(0, matrix);
+            matrixGrid3x3.put(0, matrixRow3x3);
             return matrixGrid3x3;
         }
         for (int rowIndex = 0; rowIndex < matrix.getSize();) {
+            Map<Integer, Matrix> matrixRow3x3 = new HashMap<>();
             PixelRow[] firstRowPixels = RowUtils.splitBy3(matrix.getPixelRow(rowIndex));
             PixelRow[] secondRowPixels = RowUtils.splitBy3(matrix.getPixelRow(rowIndex + 1));
             PixelRow[] thirdRowPixels = RowUtils.splitBy3(matrix.getPixelRow(rowIndex + 2));
             for (int matrixIndex = 0; matrixIndex < firstRowPixels.length; matrixIndex++) {
-                matrixGrid3x3.put(
-                        new RowColIndex(rowIndex, matrixIndex),
-                        new Matrix(firstRowPixels[matrixIndex], secondRowPixels[matrixIndex], thirdRowPixels[matrixIndex])
-                );
+                matrixRow3x3.put(matrixIndex, new Matrix(firstRowPixels[matrixIndex], secondRowPixels[matrixIndex], thirdRowPixels[matrixIndex]));
             }
+            matrixGrid3x3.put(rowIndex / 3, matrixRow3x3);
             rowIndex += 3;
         }
         return matrixGrid3x3;
     }
 
-    public static Matrix mergeMatrices(Map<RowColIndex, Matrix> matrixGrid) {
-        return null;
+    public static Matrix mergeMatrices(Map<Integer, Map<Integer, Matrix>> matrixGrid) {
+        int internalMatrixSize = matrixGrid.get(0).get(0).getSize();
+        Matrix resultMatrix = new Matrix(matrixGrid.size() * internalMatrixSize);
+
+        for (Integer rowIndex : matrixGrid.keySet()) {
+            for (Integer colIndex : matrixGrid.keySet()) {
+                Matrix matrix = matrixGrid.get(rowIndex).get(colIndex);
+                int rowOffset = rowIndex * internalMatrixSize;
+                int colOffset = colIndex * internalMatrixSize;
+                resultMatrix.setMatrix(rowOffset, colOffset, matrix);
+            }
+        }
+
+        return resultMatrix;
     }
 }
