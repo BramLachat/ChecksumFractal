@@ -57,8 +57,8 @@ public class MatrixUtils {
             Map<Integer, Matrix> matrixRow2x2 = new HashMap<>();
             PixelRow[] firstRowPixels = RowUtils.splitInRowsWithSize(matrix.getPixelRow(rowIndex), 2);
             PixelRow[] secondRowPixels = RowUtils.splitInRowsWithSize(matrix.getPixelRow(rowIndex + 1), 2);
-            for (int matrixIndex = 0; matrixIndex < firstRowPixels.length; matrixIndex++) {
-                matrixRow2x2.put(matrixIndex, new Matrix(firstRowPixels[matrixIndex], secondRowPixels[matrixIndex]));
+            for (int colIndex = 0; colIndex < firstRowPixels.length; colIndex++) {
+                matrixRow2x2.put(colIndex, new Matrix(firstRowPixels[colIndex], secondRowPixels[colIndex]));
             }
             matrixGrid2x2.put(rowIndex / 2, matrixRow2x2);
             rowIndex += 2;
@@ -79,8 +79,8 @@ public class MatrixUtils {
             PixelRow[] firstRowPixels = RowUtils.splitInRowsWithSize(matrix.getPixelRow(rowIndex), 3);
             PixelRow[] secondRowPixels = RowUtils.splitInRowsWithSize(matrix.getPixelRow(rowIndex + 1), 3);
             PixelRow[] thirdRowPixels = RowUtils.splitInRowsWithSize(matrix.getPixelRow(rowIndex + 2), 3);
-            for (int matrixIndex = 0; matrixIndex < firstRowPixels.length; matrixIndex++) {
-                matrixRow3x3.put(matrixIndex, new Matrix(firstRowPixels[matrixIndex], secondRowPixels[matrixIndex], thirdRowPixels[matrixIndex]));
+            for (int colIndex = 0; colIndex < firstRowPixels.length; colIndex++) {
+                matrixRow3x3.put(colIndex, new Matrix(firstRowPixels[colIndex], secondRowPixels[colIndex], thirdRowPixels[colIndex]));
             }
             matrixGrid3x3.put(rowIndex / 3, matrixRow3x3);
             rowIndex += 3;
