@@ -99,7 +99,7 @@ public class Main {
             for (Integer rowIndex : splitMatrixGrid.keySet()) {
                 Map<Integer, Matrix> matrixRow = splitMatrixGrid.get(rowIndex);
                 for (Integer colIndex : matrixRow.keySet()) {
-                    Matrix transRuleReplaceMatrix = transformationRuleMap.get(matrixRow.get(colIndex).toString());
+                    Matrix transRuleReplaceMatrix = transformationRuleMap.get(matrixRow.get(colIndex).asString());
                     if (transRuleReplaceMatrix != null) {
                         matrixRow.put(colIndex, transRuleReplaceMatrix);
                     }
@@ -113,8 +113,8 @@ public class Main {
     }
 
     private static void storeTransformationInMap(Map<String, Matrix> transformationRuleMap, Matrix transRuleMatchMatrix, Matrix transRuleReplaceMatrix) {
-        transformationRuleMap.put(transRuleMatchMatrix.toString(), transRuleReplaceMatrix);
-        transformationRuleMap.put(MatrixUtils.mirrorHorizontal(transRuleMatchMatrix).toString(), transRuleReplaceMatrix);
-        transformationRuleMap.put(MatrixUtils.mirrorVertical(transRuleMatchMatrix).toString(), transRuleReplaceMatrix);
+        transformationRuleMap.put(transRuleMatchMatrix.asString(), transRuleReplaceMatrix);
+        transformationRuleMap.put(MatrixUtils.mirrorHorizontal(transRuleMatchMatrix).asString(), transRuleReplaceMatrix);
+        transformationRuleMap.put(MatrixUtils.mirrorVertical(transRuleMatchMatrix).asString(), transRuleReplaceMatrix);
     }
 }

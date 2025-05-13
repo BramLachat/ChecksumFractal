@@ -68,10 +68,10 @@ public class Matrix {
         }
     }
 
-    public String toString() {
+    public String asString() {
         StringBuilder sb = new StringBuilder();
         for (PixelRow pixelRow : getCharMatrixAsPixelRows()) {
-            sb.append(pixelRow.toString());
+            sb.append(pixelRow.asString());
         }
         return sb.toString();
     }

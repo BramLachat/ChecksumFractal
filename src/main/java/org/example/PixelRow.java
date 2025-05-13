@@ -23,7 +23,7 @@ public class PixelRow {
         return pixels;
     }
 
-    public String toString() {
+    public String asString() {
         return new String(pixels);
     }
 
