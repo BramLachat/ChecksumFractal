@@ -7,29 +7,38 @@ import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
+        // +----------------------+
+        // | EXERCISE 1: CHECKSUM |
+        // +----------------------+
         Path filePath = Path.of("src/main/resources/checksum - input.txt");
         String input = FileUtils.readInputFile(filePath);
 
         int checksum = 0;
 
+        // 1.1 Compare each digit with the next digit
         int digitToCompareOffset = 1;
         checksum = calculateChecksum(input, digitToCompareOffset);
-        System.out.println("checksum with digit to compare at offset " + digitToCompareOffset + ": " + checksum);
+        System.out.println("Checksum with digit to compare at offset " + digitToCompareOffset + ": " + checksum);
 
+        // 1.2 Compare each digit with the digit halfway down the ring buffer
         digitToCompareOffset = input.length() / 2;
         checksum = calculateChecksum(input, digitToCompareOffset);
-        System.out.println("checksum with digit to compare at offset " + digitToCompareOffset + ": " + checksum);
+        System.out.println("Checksum with digit to compare at offset " + digitToCompareOffset + ": " + checksum);
 
-        // -------------------------------------------------------------------------------------------------------------
+        // +---------------------+
+        // | EXERCISE 2: FRACTAL |
+        // +---------------------+
         filePath = Path.of("src/main/resources/fractal - input.txt");
-        List<String> inputLines = FileUtils.readInputFileByLine(filePath);
-        calculateFractal(inputLines);
+        List<String> transformationRules = FileUtils.readInputFileByLine(filePath);
+        calculateFractal(transformationRules);
     }
 
-    public static int calculateChecksum(String input, int digitToCompareOffset) {
+    private static int calculateChecksum(String input, int digitToCompareOffset) {
         int currentDigit, compareDigitIndex, compareDigit, checksum = 0;
         for (int currentDigitIndex = 0; currentDigitIndex < input.length(); currentDigitIndex++) {
             currentDigit = Integer.parseInt(String.valueOf(input.charAt(currentDigitIndex)));
+            // Modulo operator to make sure the comparison starts again at the beginning when the end is reached.
+            // This will make it behave like a ring buffer.
             compareDigitIndex = (currentDigitIndex + digitToCompareOffset) % input.length();
             compareDigit = Integer.parseInt(String.valueOf(input.charAt(compareDigitIndex)));
             if (compareDigit == currentDigit) {
@@ -39,61 +48,73 @@ public class Main {
         return checksum;
     }
 
-    public static void calculateFractal(List<String> input) {
-        Map<String, Matrix> extensionRuleMap = new HashMap<>();
+    private static void calculateFractal(List<String> transformationRules) {
+        // Store all transformations inside this map to prevent
+        // that the same rotation and mirror operations must be calculated multiple times.
+        Map<String, Matrix> transformationRuleMap = new HashMap<>();
 
-        for (String inputLine : input) {
-            String[] extensionRule = inputLine.split(" => ");
+        for (String transformationRule : transformationRules) {
+            String[] transformationRuleParts = transformationRule.split(" => ");
 
-            Matrix extRuleMatchMatrix = new Matrix(extensionRule[0]);
-            Matrix extRuleReplaceMatrix = new Matrix(extensionRule[1]);
+            Matrix transRuleMatchMatrix = new Matrix(transformationRuleParts[0]);
+            Matrix transRuleReplaceMatrix = new Matrix(transformationRuleParts[1]);
 
-            extensionRuleMap.put(extRuleMatchMatrix.toString(), extRuleReplaceMatrix);
-            extensionRuleMap.put(MatrixUtils.mirrorHorizontal(extRuleMatchMatrix).toString(), extRuleReplaceMatrix);
-            extensionRuleMap.put(MatrixUtils.mirrorVertical(extRuleMatchMatrix).toString(), extRuleReplaceMatrix);
+            storeTransformationInMap(transformationRuleMap, transRuleMatchMatrix, transRuleReplaceMatrix);
 
-            extRuleMatchMatrix = MatrixUtils.rotate90ClockWise(extRuleMatchMatrix);
-            extensionRuleMap.put(extRuleMatchMatrix.toString(), extRuleReplaceMatrix);
-            extensionRuleMap.put(MatrixUtils.mirrorHorizontal(extRuleMatchMatrix).toString(), extRuleReplaceMatrix);
-            extensionRuleMap.put(MatrixUtils.mirrorVertical(extRuleMatchMatrix).toString(), extRuleReplaceMatrix);
+            transRuleMatchMatrix = MatrixUtils.rotate90ClockWise(transRuleMatchMatrix);
+            storeTransformationInMap(transformationRuleMap, transRuleMatchMatrix, transRuleReplaceMatrix);
 
-            extRuleMatchMatrix = MatrixUtils.rotate90ClockWise(extRuleMatchMatrix);
-            extensionRuleMap.put(extRuleMatchMatrix.toString(), extRuleReplaceMatrix);
-            extensionRuleMap.put(MatrixUtils.mirrorHorizontal(extRuleMatchMatrix).toString(), extRuleReplaceMatrix);
-            extensionRuleMap.put(MatrixUtils.mirrorVertical(extRuleMatchMatrix).toString(), extRuleReplaceMatrix);
+            transRuleMatchMatrix = MatrixUtils.rotate90ClockWise(transRuleMatchMatrix);
+            storeTransformationInMap(transformationRuleMap, transRuleMatchMatrix, transRuleReplaceMatrix);
 
-            extRuleMatchMatrix = MatrixUtils.rotate90ClockWise(extRuleMatchMatrix);
-            extensionRuleMap.put(extRuleMatchMatrix.toString(), extRuleReplaceMatrix);
-            extensionRuleMap.put(MatrixUtils.mirrorHorizontal(extRuleMatchMatrix).toString(), extRuleReplaceMatrix);
-            extensionRuleMap.put(MatrixUtils.mirrorVertical(extRuleMatchMatrix).toString(), extRuleReplaceMatrix);
+            transRuleMatchMatrix = MatrixUtils.rotate90ClockWise(transRuleMatchMatrix);
+            storeTransformationInMap(transformationRuleMap, transRuleMatchMatrix, transRuleReplaceMatrix);
         }
 
         String startPixelString = ".#./..#/###";
+        // currentMatrix: Stores all the pixels that are on or off in the square grid.
         Matrix currentMatrix = new Matrix(startPixelString);
 
-        for (int iteration = 0; iteration < 20; iteration++) {
-            Map<Integer, Map<Integer, Matrix>> matrixGrid = null;
+        for (int iteration = 0; iteration < 18; iteration++) {
+            // splitMatrixGrid: Contains all the split matrices.
+            // Key of first map represents the row index (x).
+            // Key of second map represents the column index (y).
+            // Value of second map contains the split matrix for row (x) and column (y).
+            Map<Integer, Map<Integer, Matrix>> splitMatrixGrid = null;
+
+            // Check that the entire grid is divisible by 2
             if (currentMatrix.getSize() % 2 == 0) {
-                matrixGrid = MatrixUtils.splitIn2x2(currentMatrix);
+                splitMatrixGrid = MatrixUtils.splitIn2x2(currentMatrix);
+
+            // Check that the entire grid is divisible by 3
             } else if (currentMatrix.getSize() % 3 == 0) {
-                matrixGrid = MatrixUtils.splitIn3x3(currentMatrix);
+                splitMatrixGrid = MatrixUtils.splitIn3x3(currentMatrix);
+
+            // Throw exception when not divisible by 2 or 3
             } else {
-                throw new RuntimeException("TODO");
+                throw new RuntimeException("Not Implemented: The current grid is not divisible by 2 or by 3");
             }
 
-            for (Integer rowIndex : matrixGrid.keySet()) {
-                Map<Integer, Matrix> matrixRow = matrixGrid.get(rowIndex);
+            // Loop over all split matrices and check if they can be replaced by one of the transformation rules.
+            for (Integer rowIndex : splitMatrixGrid.keySet()) {
+                Map<Integer, Matrix> matrixRow = splitMatrixGrid.get(rowIndex);
                 for (Integer colIndex : matrixRow.keySet()) {
-                    Matrix extRuleReplaceMatrix = extensionRuleMap.get(matrixRow.get(colIndex).toString());
-                    if (extRuleReplaceMatrix != null) {
-                        matrixRow.put(colIndex, extRuleReplaceMatrix);
+                    Matrix transRuleReplaceMatrix = transformationRuleMap.get(matrixRow.get(colIndex).toString());
+                    if (transRuleReplaceMatrix != null) {
+                        matrixRow.put(colIndex, transRuleReplaceMatrix);
                     }
                 }
             }
 
-            currentMatrix = MatrixUtils.mergeMatrices(matrixGrid);
+            currentMatrix = MatrixUtils.mergeMatrices(splitMatrixGrid);
 
             System.out.println("Iteration: " + (iteration + 1) + ", Pixels on: " + currentMatrix.getNumberOfPixelsOn());
         }
+    }
+
+    private static void storeTransformationInMap(Map<String, Matrix> transformationRuleMap, Matrix transRuleMatchMatrix, Matrix transRuleReplaceMatrix) {
+        transformationRuleMap.put(transRuleMatchMatrix.toString(), transRuleReplaceMatrix);
+        transformationRuleMap.put(MatrixUtils.mirrorHorizontal(transRuleMatchMatrix).toString(), transRuleReplaceMatrix);
+        transformationRuleMap.put(MatrixUtils.mirrorVertical(transRuleMatchMatrix).toString(), transRuleReplaceMatrix);
     }
 }

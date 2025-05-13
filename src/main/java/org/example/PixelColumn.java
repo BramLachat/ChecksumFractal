@@ -10,12 +10,4 @@ public class PixelColumn {
     public char getPixel(int index) {
         return pixels[index];
     }
-
-    public char[] getAllPixels() {
-        return pixels;
-    }
-
-    public int getSize() {
-        return pixels.length;
-    }
 }
