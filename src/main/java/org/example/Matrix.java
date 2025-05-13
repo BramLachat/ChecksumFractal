@@ -100,17 +100,13 @@ public class Matrix {
         return this.pixels;
     }
 
-    private void setPixel(int rowIndex, int colIndex, char pixel) {
-        this.pixels[rowIndex][colIndex] = pixel;
-    }
-
     public void setMatrix(int rowOffset, int colOffset, Matrix matrix) {
         char[][] matrixPixels = matrix.getAllPixels();
-        for (int rowPointer = 0; rowPointer < matrixPixels.length; rowPointer++) {
-            char[] rowPixels = matrixPixels[rowPointer];
-            for (int colPointer = 0; colPointer < rowPixels.length; colPointer++) {
-                char pixel = rowPixels[colPointer];
-                setPixel(rowOffset + rowPointer, colOffset + colPointer, pixel);
+        for (int rowIndex = 0; rowIndex < matrixPixels.length; rowIndex++) {
+            char[] rowPixels = matrixPixels[rowIndex];
+            for (int colIndex = 0; colIndex < rowPixels.length; colIndex++) {
+                char pixel = rowPixels[colIndex];
+                this.pixels[rowOffset + rowIndex][colOffset + colIndex] = pixel;
             }
         }
     }
