@@ -3,8 +3,8 @@ package org.example;
 public class PixelRow {
     private char[] pixels;
 
-    public PixelRow(String pixelRow) {
-        this.pixels = pixelRow.toCharArray();
+    public PixelRow(String pixelString) {
+        this.pixels = pixelString.toCharArray();
     }
 
     public PixelRow(char[] pixels) {
@@ -25,18 +25,6 @@ public class PixelRow {
 
     public String toString() {
         return new String(pixels);
-    }
-
-    public boolean matches(PixelRow pixelRow) {
-        if (pixelRow.pixels.length != pixels.length) {
-            return false;
-        }
-        for (int index = 0; index < pixels.length; index++) {
-            if (pixelRow.pixels[index] != pixels[index]) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public void print() {

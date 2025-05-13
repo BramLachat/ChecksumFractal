@@ -96,18 +96,6 @@ public class Matrix {
         return numberOfPixelsOn;
     }
 
-    public boolean matches(Matrix matrix) {
-        if (this.size != matrix.size) {
-            return false;
-        }
-        for (int rowIndex = 0; rowIndex < this.size; rowIndex++) {
-            if (!getPixelRow(rowIndex).matches(matrix.getPixelRow(rowIndex))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private char[][] getAllPixels() {
         return this.pixels;
     }
